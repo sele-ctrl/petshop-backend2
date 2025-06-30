@@ -1,9 +1,14 @@
 [
-
   {
     "id": 1748285544273,
     "nombre": "correa rosa de lunares",
     "precio": 4500,
     "stock": 18
+  },
+  {
+    "id": 1751275229588,
+    "nombre": "Collar con GPS",
+    "precio": 3400,
+    "stock": 5
   }
 ]

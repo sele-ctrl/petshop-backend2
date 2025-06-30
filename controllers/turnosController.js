@@ -1,23 +1,27 @@
 const Turno = require("../models/Turno");
-const { leerJSON, guardarJSON } = require("../utils/fileHandler");
 
-const archivo = "turnos.json";
-
+//---------------------BAJO TURNOS-----------------------
 async function obtenerTurnos(req, res) {
-    const turnos = await leerJSON(archivo);
-    res.json(turnos);
+    try {
+        const turnos = await Turno.find();
+        res.json(turnos);
+    } catch (error) {
+        res.status(500).json({ error: "Error al obtener turnos" });
+    }
 }
+
+//--------------------------AGREGO TURNO2----------------------
 
 async function agregarTurno(req, res) {
-    const { mascota, servicio, fecha, hora } = req.body;
-    const turnos = await leerJSON(archivo);
-    const nuevo = new Turno(Date.now(), mascota, servicio, fecha, hora);
-    turnos.push(nuevo);
-    await guardarJSON(archivo, turnos);
-    res.status(201).json(nuevo);
+    try {
+        const { fecha, hora, mascota, servicio } = req.body;
+        const nuevo = new Turno({ fecha, hora, mascota, servicio });
+        await nuevo.save();
+        res.status(201).json(nuevo);
+    } catch (error) {
+        console.error("Error al guardar el turno:", error);
+        res.status(500).json({ error: "Error al guardar el turno" });
+    }
 }
 
-module.exports = {
-    obtenerTurnos,
-    agregarTurno
-};
+module.exports = { obtenerTurnos, agregarTurno };

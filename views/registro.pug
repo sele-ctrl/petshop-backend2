@@ -1,0 +1,54 @@
+doctype html
+html(lang="es")
+  head
+    meta(charset="UTF-8")
+    title Registrarse - Huellitas Felices
+    link(href="https://fonts.googleapis.com/css2?family=Winky+Rough&display=swap", rel="stylesheet")
+    style.
+      body {
+        background-color: #121212;
+        font-family: 'Winky Rough', cursive;
+        color: #f5f5f5;
+        text-align: center;
+        padding: 2rem;
+      }
+      h1 {
+        font-size: 3rem;
+        color: #6c63ff;
+        text-shadow: 0 0 25px #6c63ff;
+      }
+      form {
+        margin-top: 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+      }
+      input {
+        padding: 10px;
+        border-radius: 8px;
+        border: none;
+        width: 250px;
+      }
+      button {
+        background-color: #6c63ff;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+      }
+      a {
+        color: #aaaaaa;
+        margin-top: 1rem;
+        display: inline-block;
+      }
+
+  body
+    h1 Crear cuenta
+    form(method="post", action="/usuario/registro")
+      input(type="text", name="usuario", placeholder="Usuario", required)
+      input(type="password", name="password", placeholder="Contraseña", required)
+      button(type="submit") Registrarme
+    a(href="/usuario/login") Ya tengo cuenta

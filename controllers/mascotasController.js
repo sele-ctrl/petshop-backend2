@@ -1,41 +1,45 @@
 const Mascota = require("../models/Mascota");
-const { leerJSON, guardarJSON } = require("../utils/fileHandler");
 
-const archivo = "mascotas.json";
-
+//-----------BAJO DE MONGODB-----------------------
 async function obtenerMascotas(req, res) {
-    const mascotas = await leerJSON(archivo);
-    res.json(mascotas);
+    try {
+        const mascotas = await Mascota.find();
+        res.json(mascotas);
+    } catch (error) {
+  console.error("Error en obtenerMascotas:", error); 
+  res.status(500).json({ error: "Error al obtener mascotas" });
 }
 
+}
+
+//------------------AGREGO---------------------
 async function agregarMascota(req, res) {
-    const { nombre, especie, raza, edad, zona, duenio } = req.body;
-    const mascotas = await leerJSON(archivo);
-    const nueva = new Mascota(Date.now(), nombre, especie, raza, edad, zona, duenio);
-    mascotas.push(nueva);
-    await guardarJSON(archivo, mascotas);
-    res.status(201).json(nueva);
+    try {
+        const { nombre, especie, raza, edad, zona, duenio } = req.body;
+        const nueva = new Mascota({ nombre, especie, raza, edad, zona, duenio });
+        await nueva.save();
+        res.status(201).json(nueva);
+    } catch (error) {
+    res.status(500).json({ error: "Error al guardar la mascota" });
+    }
+
 }
 
+
+//------------------BUSCO NOMBRE/ZONA--------------------
 async function buscarMascota(req, res) {
-    const { nombre, zona } = req.query;
-    const mascotas = await leerJSON(archivo);
+    try {
+        const { nombre, zona } = req.query;
 
-    let resultado = mascotas;
+        const filtro = {};
+        if (nombre) filtro.nombre = new RegExp(`^${nombre}$`, "i"); //PROBLEMA CON MAYUSC AHORA NO PASA NADA
+        if (zona) filtro.zona = new RegExp(`^${zona}$`, "i");
 
-    if (nombre) {
-        resultado = resultado.filter(m =>
-            m.nombre.toLowerCase() === nombre.toLowerCase()
-    );
-  }
-
-    if (zona) {
-        resultado = resultado.filter(m =>
-            m.zona.toLowerCase() === zona.toLowerCase()
-    );
-  }
-
-    res.json(resultado);
+        const resultado = await Mascota.find(filtro);
+        res.json(resultado);
+    } catch (error) {
+        res.status(500).json({ error: "Error al buscar mascotas" });
+    }
 }
 
 module.exports = {

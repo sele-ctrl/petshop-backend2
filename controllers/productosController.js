@@ -1,20 +1,25 @@
 const Producto = require("../models/Producto");
-const { leerJSON, guardarJSON } = require("../utils/fileHandler");
 
-const archivo = "productos.json";
-
+//------------BAJO PPROD-------------------------
 async function obtenerProductos(req, res) {
-    const productos = await leerJSON(archivo);
-    res.json(productos);
+    try {
+        const productos = await Producto.find();
+        res.json(productos);
+    } catch (error) {
+        res.status(500).json({ error: "Error al obtener productos" });
+    }
 }
 
+//--------------AGREGO PROD-------------
 async function agregarProducto(req, res) {
-    const productos = await leerJSON(archivo);
-    const {nombre, precio, stock}= req.body;
-    const nuevo = new Producto(Date.now(), nombre, precio, stock);
-    productos.push(nuevo);
-    await guardarJSON(archivo, productos);
-    res.status(201).json(nuevo);
+    try {
+        const { nombre, precio, stock } = req.body;
+        const nuevo = new Producto({ nombre, precio, stock });
+        await nuevo.save();
+        res.status(201).json(nuevo);
+    } catch (error) {
+        res.status(500).json({ error: "Error al guardar el producto" });
+    }
 }
 
-module.exports = {obtenerProductos, agregarProducto};
+module.exports = { obtenerProductos, agregarProducto };

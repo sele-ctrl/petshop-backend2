@@ -1,49 +1,84 @@
 const express = require("express");
-const app = express();
-const PORT = 3000;
-
-//pug
-app.set("view engine", "pug");
-app.set("views", "./views");
-
-
-app.use(express.json());
-
-
-
+const { connectDB } = require('./config/mongo');
 const logger = require("./middlewares/logger");
+const session = require("express-session");
+const path = require('path');
 
-app.use(express.json()); 
-app.use(logger); 
 
-//---------------------------------------------
+
+const loginRoutes = require("./routes/logRoutes");
+
 
 
 const productosRoutes = require("./routes/productos");
-app.use("/productos", productosRoutes);
-
 const mascotasRoutes = require("./routes/mascotas");
-app.use("/mascotas", mascotasRoutes);
-
 const turnosRoutes = require("./routes/turnos");
+
+const Mascota = require("./models/Mascota");
+
+const app = express();
+const PORT = 3000;
+
+//------------------pug----------------------
+app.set("view engine", "pug");
+app.set("views", "./views");
+
+app.use(express.json());
+app.use(logger);
+
+app.use(express.urlencoded({ extended: true })); 
+
+
+app.use(session({
+  secret: "secreto123",         
+  resave: false,                
+  saveUninitialized: false,     
+  cookie: { secure: false }     
+}));
+
+
+
+//------------------prutas----------------------
+app.use("/productos", productosRoutes);
+app.use("/mascotas", mascotasRoutes);
 app.use("/turnos", turnosRoutes);
+app.use("/usuario", loginRoutes);
 
-//---------------------------------------------------
 
-const { leerJSON } = require("./utils/fileHandler");
-app.get("/vista-productos", async (req, res) => {
-  const productos = await leerJSON("productos.json");
-  res.render("productos", { productos });
-});
 
+//---------------MONGOBS BIEN MASCOTAS-----------------------
 app.get("/vista-mascotas", async (req, res) => {
-  const mascotas = await leerJSON("mascotas.json");
-  res.render("mascotas", { mascotas });
+  try {
+    const mascotas = await Mascota.find();
+    res.render("mascotas", { mascotas });
+  } catch (error) {
+    res.status(500).send("Error al cargar mascotas");
+  }
 });
+//---------------MONGOBS BIEN turno-----------------------
+const Turno = require("./models/Turno");
 
 app.get("/vista-turnos", async (req, res) => {
-  const turnos = await leerJSON("turnos.json");
-  res.render("turnos", { turnos });
+  try {
+    const turnos = await Turno.find();
+    res.render("turnos", { turnos });
+  } catch (error) {
+    console.error("Error al cargar turnos:", error);
+    res.status(500).send("Error al cargar turnos");
+  }
+});
+
+//---------------MONGOBS BIEN PRODUCTO-----------------------
+const Producto = require("./models/Producto");
+
+app.get("/vista-productos", async (req, res) => {
+  try {
+    const productos = await Producto.find();
+    res.render("productos", { productos });
+  } catch (error) {
+    console.error("Error al cargar productos:", error);
+    res.status(500).send("Error al cargar productos");
+  }
 });
 
 
@@ -51,8 +86,14 @@ app.get("/vista-turnos", async (req, res) => {
 
 app.get("/", (req, res) => {
   res.render("index");
-});//prueba http://localhost:3000/
-
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
+
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Servidor corriendo en http://localhost:${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error("No se pudo conectar a MongoDB:", error);
+  });
