@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1748285876742,
+    "mascota": "Lola",
+    "servicio": "veterinaria",
+    "fecha": "2025-06-12",
+    "hora": "14:15"
+  },
+  {
+    "id": 1748640903356,
+    "mascota": "pepito",
+    "servicio": "veterinaria",
+    "fecha": "2025-06-30",
+    "hora": "14:15"
+  }
+]
