@@ -4,6 +4,7 @@ html(lang="es")
     meta(charset="UTF-8")
     title Huellitas Felices
     link(href="https://fonts.googleapis.com/css2?family=Winky+Rough&display=swap", rel="stylesheet")
+
     style.
       body {
         background-color: #121212;
@@ -64,6 +65,11 @@ html(lang="es")
 
 
   body
+    if session && session.usuario
+      p Bienvenido #{session.usuario}
+      a(href="/logout") Cerrar sesión
+    else
+      a(href="/usuario/login") Iniciar sesión
     h1 Huellitas Felices
     h2 Sistema de Gestión
     p Bienvenidos al sistema de gestión del Petshop. ¿Quiere consultar productos, mascotas registradas y turnos programados?

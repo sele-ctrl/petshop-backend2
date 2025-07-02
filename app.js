@@ -3,13 +3,11 @@ const { connectDB } = require('./config/mongo');
 const logger = require("./middlewares/logger");
 const session = require("express-session");
 const path = require('path');
+const { requiereLogin } = require("./middlewares/auth");
 
 
 
-const loginRoutes = require("./routes/logRoutes");
-
-
-
+const usuariosRoutes = require("./routes/usuarios");
 const productosRoutes = require("./routes/productos");
 const mascotasRoutes = require("./routes/mascotas");
 const turnosRoutes = require("./routes/turnos");
@@ -36,18 +34,33 @@ app.use(session({
   cookie: { secure: false }     
 }));
 
+const sessionToViews = require('./middlewares/sessionToViews');
+
+app.use(sessionToViews);
 
 
-//------------------prutas----------------------
+app.use((req, res, next) => {
+  console.log("Sesión actual:", req.session);
+  next();
+});
+
+
+//------------------rutas----------------------
 app.use("/productos", productosRoutes);
 app.use("/mascotas", mascotasRoutes);
 app.use("/turnos", turnosRoutes);
-app.use("/usuario", loginRoutes);
+app.use("/usuario", usuariosRoutes);
+
+// ----redireccionar /login a /usuario/login------
+
+app.get("/login", (req, res) => {
+  res.redirect("/usuario/login");
+});
 
 
 
 //---------------MONGOBS BIEN MASCOTAS-----------------------
-app.get("/vista-mascotas", async (req, res) => {
+app.get("/vista-mascotas", requiereLogin, async (req, res) => {
   try {
     const mascotas = await Mascota.find();
     res.render("mascotas", { mascotas });
@@ -58,7 +71,7 @@ app.get("/vista-mascotas", async (req, res) => {
 //---------------MONGOBS BIEN turno-----------------------
 const Turno = require("./models/Turno");
 
-app.get("/vista-turnos", async (req, res) => {
+app.get("/vista-turnos", requiereLogin, async (req, res) => {
   try {
     const turnos = await Turno.find();
     res.render("turnos", { turnos });
@@ -71,7 +84,7 @@ app.get("/vista-turnos", async (req, res) => {
 //---------------MONGOBS BIEN PRODUCTO-----------------------
 const Producto = require("./models/Producto");
 
-app.get("/vista-productos", async (req, res) => {
+app.get("/vista-productos", requiereLogin, async (req, res) => {
   try {
     const productos = await Producto.find();
     res.render("productos", { productos });
@@ -81,7 +94,19 @@ app.get("/vista-productos", async (req, res) => {
   }
 });
 
+app.get("/perfil", requiereLogin, (req, res) => {
+  res.send(`Bienvenido/a ${req.session.usuario}`);
+});
 
+
+app.get("/logout", (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      return res.send("Error al cerrar sesión");
+    }
+    res.redirect("/usuario/login");
+  });
+});
 
 
 app.get("/", (req, res) => {
@@ -96,4 +121,5 @@ connectDB()
   })
   .catch((error) => {
     console.error("No se pudo conectar a MongoDB:", error);
+
   });

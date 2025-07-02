@@ -12,6 +12,7 @@ html(lang="es")
         text-align: center;
         padding: 2rem;
       }
+      
       h1 {
         font-size: 3rem;
         color: #6c63ff;
@@ -46,6 +47,11 @@ html(lang="es")
       }
 
   body
+    if session && session.usuario
+      p Bienvenido #{session.usuario}
+      a(href="/logout") Cerrar sesión
+    else
+      a(href="/usuario/login") Iniciar sesión
     h1 Crear cuenta
     form(method="post", action="/usuario/registro")
       input(type="text", name="usuario", placeholder="Usuario", required)
