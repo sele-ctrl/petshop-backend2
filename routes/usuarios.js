@@ -2,9 +2,10 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const Usuario = require("../models/Usuario");
 const router = express.Router();
+const redirectIfLoggedIn = require("../middlewares/redirectIfLoggedIn");
 
-// GET formulario registro
-router.get("/registro", (req, res) => {
+// GET formulario de registro
+router.get("/registro", redirectIfLoggedIn, (req, res) => {
   res.render("registro");
 });
 
@@ -22,12 +23,12 @@ router.post("/registro", async (req, res) => {
   }
 });
 
-// GET formulario login
-router.get("/login", (req, res) => {
+// GET login
+router.get("/login", redirectIfLoggedIn, (req, res) => {
   res.render("login");
 });
 
-// POST login usuario
+// POST login
 router.post("/login", async (req, res) => {
   const { usuario, password } = req.body;
   const user = await Usuario.findOne({ username: usuario });
