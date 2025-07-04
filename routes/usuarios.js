@@ -18,8 +18,11 @@ router.post("/registro", async (req, res) => {
     await nuevoUsuario.save();
     res.redirect("/usuario/login");
   } catch (error) {
-    console.error("Error al registrar:", error);
-    res.send("Error al registrar");
+    let mensaje = "Error al registrar";
+    if (error.code === 11000) {
+      mensaje = "El usuario ya existe";
+    }
+    res.render("registro", { error: mensaje, usuario });
   }
 });
 

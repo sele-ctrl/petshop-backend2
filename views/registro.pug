@@ -2,8 +2,10 @@ extends layout
 
 block content
   h1 Crear cuenta
+  if error
+    p(style="color:#ff6b6b;font-weight:bold;") #{error}
   form(method="post", action="/usuario/registro")
-    input(type="text", name="usuario", placeholder="Usuario", required)
-    input(type="password", name="password", placeholder="Contraseña", required)
+    input(type="text", name="usuario", placeholder="Usuario", required, value=usuario || "")
+    input(type="password", name="password", placeholder="Contraseña", required, value="")
     button(type="submit") Registrarme
   a(href="/usuario/login") Ya tengo cuenta
