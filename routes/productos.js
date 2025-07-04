@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const {
-    obtenerProductos,
-    agregarProducto
+  obtenerProductos,
+  agregarProducto
 } = require("../controllers/productosController");
 
 router.get("/", obtenerProductos);
