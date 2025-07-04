@@ -10,10 +10,14 @@ const obtenerTurnos = async (req, res) => {
 };
 
 const agregarTurno = async (req, res) => {
-  const { cliente, fecha } = req.body;
+  const { mascota, servicio, fecha, hora } = req.body;
   try {
-    const nuevoTurno = new Turno({ cliente, fecha });
+    const nuevoTurno = new Turno({ mascota, servicio, fecha, hora });
     await nuevoTurno.save();
+
+    // Emitir evento al cliente con el nuevo turno
+    req.io.emit("nuevoTurno", nuevoTurno);
+
     res.redirect("/vista-turnos");
   } catch (error) {
     res.status(500).send("Error al agregar turno");

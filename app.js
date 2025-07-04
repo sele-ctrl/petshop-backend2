@@ -1,4 +1,6 @@
 const express = require("express");
+const http = require("http"); // Agregado
+const { Server } = require("socket.io"); // Agregado
 const { connectDB } = require('./config/mongo');
 const session = require("express-session");
 const path = require('path');
@@ -15,13 +17,13 @@ const Turno = require("./models/Turno");
 const Producto = require("./models/Producto");
 
 const app = express();
-const PORT = 3000;
+const server = http.createServer(app); // Usar server
+const io = new Server(server); // Crear instancia socket.io
 
-// PUG
 app.set("view engine", "pug");
 app.set("views", "./views");
 
-// Middlewares
+app.use(express.static(path.join(__dirname, 'public'))); // Servir archivos públicos
 app.use(express.json());
 app.use(logger);
 app.use(express.urlencoded({ extended: true }));
@@ -41,18 +43,20 @@ app.use((req, res, next) => {
   next();
 });
 
+// Exponer io globalmente
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
+
 // Rutas
 app.use("/productos", productosRoutes);
 app.use("/mascotas", mascotasRoutes);
 app.use("/turnos", turnosRoutes);
 app.use("/usuario", usuariosRoutes);
 
-// Redirección /login
-app.get("/login", (req, res) => {
-  res.redirect("/usuario/login");
-});
+app.get("/login", (req, res) => res.redirect("/usuario/login"));
 
-// Vistas protegidas
 app.get("/vista-mascotas", requiereLogin, async (req, res) => {
   try {
     const mascotas = await Mascota.find();
@@ -92,10 +96,9 @@ app.get("/", (req, res) => {
 });
 
 connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  server.listen(3000, () => {
+    console.log(`Servidor corriendo en http://localhost:3000`);
   });
 }).catch((error) => {
   console.error("No se pudo conectar a MongoDB:", error);
 });
-

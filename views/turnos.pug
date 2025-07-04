@@ -3,6 +3,28 @@ extends layout
 block content
   h1 Huellitas Felices
   h2 Turnos registrados
-  ul
+
+  ul#lista-turnos
     each turno in turnos
       li Mascota: #{turno.mascota} - Servicio: #{turno.servicio} - Fecha: #{turno.fecha} - Hora: #{turno.hora}
+
+  h2 Agregar nuevo turno
+  form(action="/turnos", method="POST")
+    .mb-3
+      label(for="mascota") Mascota:
+      input.form-control(type="text", name="mascota", required)
+    .mb-3
+      label(for="servicio") Servicio:
+      input.form-control(type="text", name="servicio", required)
+    .mb-3
+      label(for="fecha") Fecha:
+      input.form-control(type="date", name="fecha", required)
+    .mb-3
+      label(for="hora") Hora:
+      input.form-control(type="time", name="hora", required)
+    button.btn.btn-primary(type="submit") Agregar turno
+
+  // Scripts de WebSocket
+  script(src="/socket.io/socket.io.js")
+  script(src="/js/turnos-socket.js")
+
