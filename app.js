@@ -98,3 +98,4 @@ connectDB().then(() => {
 }).catch((error) => {
   console.error("No se pudo conectar a MongoDB:", error);
 });
+

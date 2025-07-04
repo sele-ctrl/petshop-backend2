@@ -1,11 +1,15 @@
+
+
 extends layout
 
 block content
   h1 Iniciar sesión
+  if error
+    p(style="color:#ff6b6b;font-weight:bold;") #{error}
   form(action="/usuario/login", method="POST")
-    input(type="text", name="usuario", placeholder="Usuario")
+    input(type="text", name="usuario", placeholder="Usuario", value=usuario || "")
     br
-    input(type="password", name="password", placeholder="Contraseña")
+    input(type="password", name="password", placeholder="Contraseña", value="")
     br
     button(type="submit") Ingresar
   br

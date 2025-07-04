@@ -29,18 +29,21 @@ router.get("/login", redirectIfLoggedIn, (req, res) => {
 });
 
 // POST login
+
 router.post("/login", async (req, res) => {
   const { usuario, password } = req.body;
   const user = await Usuario.findOne({ username: usuario });
 
-  if (!user) return res.send("Usuario no encontrado");
+  if (!user) {
+    return res.render("login", { error: "Usuario no encontrado", usuario });
+  }
 
   const match = await bcrypt.compare(password, user.password);
   if (match) {
     req.session.usuario = usuario;
-    res.redirect("/perfil");
+    res.redirect("/"); // Redirige a la pantalla principal
   } else {
-    res.send("Contraseña incorrecta");
+    res.render("login", { error: "Contraseña incorrecta", usuario });
   }
 });
 

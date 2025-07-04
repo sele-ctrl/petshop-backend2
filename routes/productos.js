@@ -9,4 +9,3 @@ router.get("/", obtenerProductos);
 router.post("/", agregarProducto);
 
 module.exports = router;
-
